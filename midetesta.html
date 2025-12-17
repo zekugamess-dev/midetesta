@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Medidor Oficial del Mito — NSFW Edition</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#050505;
+  --panel:#0b0b0b;
+  --rule:#f5f5f5;
+  --red:#ff2b2b;
+  --txt:#ffffff;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:Inter,system-ui,sans-serif;
+  background:
+    radial-gradient(900px 500px at 15% 20%, rgba(255,0,0,.18), transparent 60%),
+    radial-gradient(700px 400px at 85% 70%, rgba(255,40,40,.12), transparent 65%),
+    linear-gradient(180deg,#050505,#0a0a0a);
+  color:#fff;
+}
+
+.app{
+  max-width:1200px;
+  margin:30px auto;
+  padding:20px;
+  display:grid;
+  grid-template-columns: 1.4fr .6fr;
+  gap:20px;
+}
+@media(max-width:900px){
+  .app{grid-template-columns:1fr}
+}
+
+.card{
+  background:linear-gradient(180deg,#0f0f0f,#060606);
+  border-radius:20px;
+  padding:20px;
+  box-shadow:0 30px 60px rgba(0,0,0,.6);
+}
+
+/* ================= RULE ================= */
+
+.exportZone{
+  background:#000;
+  border-radius:18px;
+  padding:20px;
+}
+
+.rulerWrap{padding:18px}
+
+.ruler{
+  width:100%;
+  height:120px;
+  background:var(--rule);
+  border-radius:14px;
+  position:relative;
+  display:flex;
+}
+
+/* vibración */
+.ruler.vibe{
+  animation:shake .15s infinite;
+}
+@keyframes shake{
+  0%{transform:translateX(0)}
+  25%{transform:translateX(-2px)}
+  50%{transform:translateX(2px)}
+  75%{transform:translateX(-1px)}
+  100%{transform:translateX(0)}
+}
+
+.cm{
+  flex:1;
+  position:relative;
+  border-left:2px solid #000;
+}
+
+.cm::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:0;
+  width:2px;
+  height:28px;
+  background:#000;
+  transform:translateX(-50%);
+}
+
+.cm span{
+  position:absolute;
+  top:6px;
+  left:6px;
+  font-weight:900;
+  font-size:14px;
+  color:#000;
+}
+
+/* ================= MARKS ================= */
+
+.mark{
+  position:absolute;
+  top:0;
+  bottom:0;
+  width:4px;
+  background:var(--red);
+  box-shadow:0 0 18px var(--red);
+}
+
+.markLabel{
+  position:absolute;
+  top:-38px;
+  background:#000;
+  border:1px solid var(--red);
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:900;
+  white-space:nowrap;
+  transform:translateX(-50%);
+}
+
+/* ================= UI ================= */
+
+button{
+  background:var(--red);
+  border:none;
+  color:#fff;
+  font-weight:900;
+  padding:12px 18px;
+  border-radius:999px;
+  cursor:pointer;
+}
+
+button.nsfw{
+  background:#222;
+  border:2px solid var(--red);
+}
+
+button.nsfw.active{
+  background:var(--red);
+  box-shadow:0 0 25px var(--red);
+}
+
+input{
+  width:100%;
+  background:#000;
+  border:1px solid #333;
+  color:#fff;
+  padding:12px;
+  border-radius:12px;
+}
+
+.meme{
+  margin-top:12px;
+  padding:12px;
+  border:1px solid var(--red);
+  border-radius:14px;
+  font-weight:700;
+}
+
+.list{
+  margin-top:16px;
+  font-size:13px;
+}
+.list div{
+  display:flex;
+  justify-content:space-between;
+  padding:6px 0;
+  border-bottom:1px dashed #333;
+}
+.list button{
+  padding:2px 8px;
+  font-size:12px;
+}
+
+.footer{
+  margin-top:40px;
+  padding:20px 10px;
+  text-align:center;
+  font-size:13px;
+  color:#aaa;
+  opacity:.85;
+}
+
+.footer a{
+  color:#ff2b2b;
+  text-decoration:none;
+  font-weight:700;
+}
+
+.footer a:hover{
+  text-decoration:underline;
+}
+
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- LEFT -->
+<div class="card">
+  <h2>📏 Medidor Oficial del Mito 😈</h2>
+
+  <div class="exportZone" id="exportZone">
+    <div class="rulerWrap">
+      <div class="ruler" id="ruler"></div>
+    </div>
+  </div>
+
+  <div class="meme" id="meme">🙂 Zona segura</div>
+
+  <br>
+  <button onclick="exportPNG()">Exportar PNG</button>
+</div>
+
+<!-- RIGHT -->
+<div class="card">
+  <label>Texto marca</label>
+  <input id="label" placeholder="Modo leyenda">
+
+  <br><br>
+  <label>Medida (cm)</label>
+  <input id="cm" type="number" min="0" max="20" value="3">
+
+  <br><br>
+  <button onclick="addMark()">Agregar marca</button>
+  <button class="nsfw" id="nsfwBtn" onclick="toggleNSFW()">NSFW</button>
+
+  <div class="list" id="list"></div>
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<script>
+const ruler=document.getElementById("ruler");
+const meme=document.getElementById("meme");
+const list=document.getElementById("list");
+const nsfwBtn=document.getElementById("nsfwBtn");
+
+let nsfw=false;
+let marks=[];
+
+function buildRuler(){
+  ruler.innerHTML="";
+  for(let i=0;i<=20;i++){
+    const c=document.createElement("div");
+    c.className="cm";
+
+    if(i === 0) c.id="cmStart";
+    if(i === 20) c.id="cmEnd";
+
+    if(i>0){
+      const s=document.createElement("span");
+      s.textContent=i;
+      c.appendChild(s);
+    }
+    ruler.appendChild(c);
+  }
+}
+
+function cmToPx(cm){
+  const start=document.getElementById("cmStart").getBoundingClientRect();
+  const end=document.getElementById("cmEnd").getBoundingClientRect();
+  const rulerRect=ruler.getBoundingClientRect();
+  const usable=end.left-start.left;
+  return (start.left-rulerRect.left)+(cm*(usable/20));
+}
+
+function toggleNSFW(){
+  nsfw=!nsfw;
+  nsfwBtn.classList.toggle("active",nsfw);
+  updateMeme(0);
+}
+
+function updateMeme(cm){
+  ruler.classList.remove("vibe");
+
+  if(!nsfw){
+    meme.textContent="🙂 Modo normal activado";
+    return;
+  }
+
+  if(cm >= 20){
+    meme.textContent="👹 NSFW: entidad mitológica no registrada";
+    ruler.classList.add("vibe");
+  }
+  else if(cm >= 18){
+    meme.textContent="🔥 NSFW: arma de destrucción masiva";
+    ruler.classList.add("vibe");
+  }
+  else if(cm >= 15){
+    meme.textContent="😈 NSFW: épico, digno de leyenda";
+    ruler.classList.add("vibe");
+  }
+  else if(cm >= 10){
+    meme.textContent="🗿 NSFW: respetable, se para solo";
+  }
+  else if(cm >= 5){
+    meme.textContent="⚔️ NSFW: guerrero en entrenamiento";
+  }
+  else if(cm >= 3){
+    meme.textContent="💪 NSFW: TITÁN compacto";
+  }
+  else{
+    meme.textContent="🐣 NSFW: edición bolsillo premium";
+  }
+}
+
+function addMark(){
+  const cm=parseFloat(document.getElementById("cm").value);
+  const text=document.getElementById("label").value||"Marca";
+  const x=cmToPx(cm);
+
+  const m=document.createElement("div");
+  m.className="mark";
+  m.style.left=x+"px";
+
+  const l=document.createElement("div");
+  l.className="markLabel";
+  l.style.left=x+"px";
+  l.textContent=`${text} · ${cm}cm`;
+
+  ruler.appendChild(m);
+  ruler.appendChild(l);
+
+  marks.push({cm,text,m,l});
+  renderList();
+  updateMeme(cm);
+}
+
+function renderList(){
+  list.innerHTML="";
+  marks.forEach((mk,i)=>{
+    const d=document.createElement("div");
+    d.innerHTML=`${mk.text} · ${mk.cm}cm <button onclick="removeMark(${i})">X</button>`;
+    list.appendChild(d);
+  });
+}
+
+function removeMark(i){
+  ruler.removeChild(marks[i].m);
+  ruler.removeChild(marks[i].l);
+  marks.splice(i,1);
+  renderList();
+}
+
+async function exportPNG(){
+  const c=await html2canvas(document.getElementById("exportZone"),{scale:2});
+  const a=document.createElement("a");
+  a.href=c.toDataURL();
+  a.download="medidor-del-mito.png";
+  a.click();
+}
+
+buildRuler();
+</script>
+
+<footer class="footer">
+  Creado por <b>ZekuGamess</b> · 
+  <a href="https://www.twitch.tv/zekugamess" target="_blank" rel="noopener">
+    twitch.tv/zekugamess
+  </a>
+</footer>
+
+
+</body>
+</html>
