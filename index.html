@@ -378,12 +378,12 @@ buildRuler();
 const botStatus = document.getElementById("botStatus");
 
 // Opción 1: si abrís la web desde el mismo server (express), esto funciona:
-const WS_URL = (location.protocol === "https:" ? "wss://" : "ws://") + location.host;
+// const WS_URL = (location.protocol === "https:" ? "wss://" : "ws://") + location.host;
 
 // Opción 2 (cuando tu web esté en Netlify):
 // pon aquí el ws del bot, ej: "wss://tu-bot.onrender.com"
 //
-// const WS_URL = "wss://TU_BACKEND_AQUI";
+const WS_URL = "memidebot.railway.internal";
 
 function connectWS() {
   try {
@@ -436,3 +436,4 @@ connectWS();
 
 </body>
 </html>
+
