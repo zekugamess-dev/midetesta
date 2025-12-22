@@ -4,9 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Medidor Oficial del Mito — NSFW Edition</title>
-<div style="opacity:.75;font-size:12px;margin-top:-8px;margin-bottom:8px;">
-  Estado bot: <span id="botStatus">desconectado</span>
-</div>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 
@@ -204,8 +201,6 @@ input{
 .footer a:hover{
   text-decoration:underline;
 }
-
-
 </style>
 </head>
 
@@ -216,6 +211,11 @@ input{
 <!-- LEFT -->
 <div class="card">
   <h2>📏 Medidor Oficial del Mito 😈</h2>
+
+  <!-- ✅ MOVIDO AQUÍ (antes estaba mal en el <head>) -->
+  <div style="opacity:.75;font-size:12px;margin-top:-8px;margin-bottom:8px;">
+    Estado bot: <span id="botStatus">desconectado</span>
+  </div>
 
   <div class="exportZone" id="exportZone">
     <div class="rulerWrap">
@@ -372,6 +372,7 @@ async function exportPNG(){
 
 buildRuler();
 </script>
+
 <script>
 /* ======= TWITCH BOT LIVE (WebSocket) ======= */
 const botStatus = document.getElementById("botStatus");
@@ -427,13 +428,11 @@ connectWS();
 </script>
 
 <footer class="footer">
-  Creado por <b>ZekuGamess</b> · 
+  Creado por <b>ZekuGamess</b> ·
   <a href="https://www.twitch.tv/zekugamess" target="_blank" rel="noopener">
     twitch.tv/zekugamess
   </a>
 </footer>
 
-
 </body>
 </html>
-
