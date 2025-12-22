@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Medidor Oficial del Mito — NSFW Edition</title>
+<div style="opacity:.75;font-size:12px;margin-top:-8px;margin-bottom:8px;">
+  Estado bot: <span id="botStatus">desconectado</span>
+</div>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 
@@ -369,6 +372,59 @@ async function exportPNG(){
 
 buildRuler();
 </script>
+<script>
+/* ======= TWITCH BOT LIVE (WebSocket) ======= */
+const botStatus = document.getElementById("botStatus");
+
+// Opción 1: si abrís la web desde el mismo server (express), esto funciona:
+const WS_URL = (location.protocol === "https:" ? "wss://" : "ws://") + location.host;
+
+// Opción 2 (cuando tu web esté en Netlify):
+// pon aquí el ws del bot, ej: "wss://tu-bot.onrender.com"
+//
+// const WS_URL = "wss://TU_BACKEND_AQUI";
+
+function connectWS() {
+  try {
+    const ws = new WebSocket(WS_URL);
+
+    ws.addEventListener("open", () => {
+      if (botStatus) botStatus.textContent = "conectado ✅";
+    });
+
+    ws.addEventListener("close", () => {
+      if (botStatus) botStatus.textContent = "desconectado ❌ (reintentando...)";
+      setTimeout(connectWS, 1500);
+    });
+
+    ws.addEventListener("error", () => {
+      if (botStatus) botStatus.textContent = "error ❌";
+    });
+
+    ws.addEventListener("message", (ev) => {
+      let data;
+      try { data = JSON.parse(ev.data); } catch { return; }
+
+      if (data.type === "mark") {
+        // Inyectamos valores a tus inputs y usamos TU addMark()
+        const labelEl = document.getElementById("label");
+        const cmEl = document.getElementById("cm");
+
+        if (labelEl) labelEl.value = data.text || data.user || "Marca";
+        if (cmEl) cmEl.value = Number(data.cm ?? 0);
+
+        // Llama tu función existente
+        if (typeof addMark === "function") addMark();
+      }
+    });
+
+  } catch (e) {
+    if (botStatus) botStatus.textContent = "no soportado";
+  }
+}
+
+connectWS();
+</script>
 
 <footer class="footer">
   Creado por <b>ZekuGamess</b> · 
@@ -380,3 +436,4 @@ buildRuler();
 
 </body>
 </html>
+
